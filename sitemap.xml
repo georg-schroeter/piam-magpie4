@@ -78,6 +78,7 @@
 <url><loc>/reference/costsWholesale.html</loc></url>
 <url><loc>/reference/croparea.html</loc></url>
 <url><loc>/reference/cropland.html</loc></url>
+<url><loc>/reference/croplandSCM.html</loc></url>
 <url><loc>/reference/croplandTreeCover.html</loc></url>
 <url><loc>/reference/cshare.html</loc></url>
 <url><loc>/reference/deco.html</loc></url>
@@ -85,25 +86,24 @@
 <url><loc>/reference/demandBioenergy.html</loc></url>
 <url><loc>/reference/disaggregateLandConservation.html</loc></url>
 <url><loc>/reference/discountRates.html</loc></url>
+<url><loc>/reference/domesticFootprintTrade.html</loc></url>
 <url><loc>/reference/embodiedBiodiversity.html</loc></url>
 <url><loc>/reference/embodiedEmissions.html</loc></url>
 <url><loc>/reference/embodiedLabor.html</loc></url>
 <url><loc>/reference/embodiedLand.html</loc></url>
+<url><loc>/reference/embodiedResourceKastner.html</loc></url>
 <url><loc>/reference/embodiedWater.html</loc></url>
 <url><loc>/reference/emisCO2.html</loc></url>
 <url><loc>/reference/emisSOC.html</loc></url>
 <url><loc>/reference/expectVariablesPresent.html</loc></url>
 <url><loc>/reference/expenditureIndexFood.html</loc></url>
-<url><loc>/reference/extractBiogasFeedstock.html</loc></url>
-<url><loc>/reference/extractCropResidues2ndBE.html</loc></url>
-<url><loc>/reference/extractManureFuel.html</loc></url>
-<url><loc>/reference/extractProcessingWoodResidues.html</loc></url>
-<url><loc>/reference/extractWoodFuel.html</loc></url>
 <url><loc>/reference/factorCostShares.html</loc></url>
 <url><loc>/reference/factorCosts.html</loc></url>
 <url><loc>/reference/fallow.html</loc></url>
 <url><loc>/reference/feed.html</loc></url>
 <url><loc>/reference/foodmodelstat.html</loc></url>
+<url><loc>/reference/footprintDemand.html</loc></url>
+<url><loc>/reference/footprints.html</loc></url>
 <url><loc>/reference/gdxAggregate.html</loc></url>
 <url><loc>/reference/getReport.html</loc></url>
 <url><loc>/reference/getReportAgMIP.html</loc></url>
@@ -159,6 +159,7 @@
 <url><loc>/reference/productionProfit.html</loc></url>
 <url><loc>/reference/productionRevenue.html</loc></url>
 <url><loc>/reference/readGDXBilateral.html</loc></url>
+<url><loc>/reference/reassignLivestockPathway.html</loc></url>
 <url><loc>/reference/relativeHourlyLaborCosts.html</loc></url>
 <url><loc>/reference/reportAAI.html</loc></url>
 <url><loc>/reference/reportAEI.html</loc></url>
@@ -168,6 +169,7 @@
 <url><loc>/reference/reportAnthropometrics.html</loc></url>
 <url><loc>/reference/reportBII.html</loc></url>
 <url><loc>/reference/reportBiochar.html</loc></url>
+<url><loc>/reference/reportBiogasFeedstock.html</loc></url>
 <url><loc>/reference/reportBioplasticDemand.html</loc></url>
 <url><loc>/reference/reportCarbonstock.html</loc></url>
 <url><loc>/reference/reportConsumVal.html</loc></url>
@@ -187,8 +189,10 @@
 <url><loc>/reference/reportCostsWholesale.html</loc></url>
 <url><loc>/reference/reportCostsWithoutIncentives.html</loc></url>
 <url><loc>/reference/reportCropDiversity.html</loc></url>
+<url><loc>/reference/reportCropResidues2ndBE.html</loc></url>
 <url><loc>/reference/reportCroparea.html</loc></url>
 <url><loc>/reference/reportCropareaGrid.html</loc></url>
+<url><loc>/reference/reportCroplandSCM.html</loc></url>
 <url><loc>/reference/reportDemand.html</loc></url>
 <url><loc>/reference/reportDemandBioenergy.html</loc></url>
 <url><loc>/reference/reportDemandNr.html</loc></url>
@@ -203,6 +207,7 @@
 <url><loc>/reference/reportFireEmissions.html</loc></url>
 <url><loc>/reference/reportFit.html</loc></url>
 <url><loc>/reference/reportFoodExpenditure.html</loc></url>
+<url><loc>/reference/reportFootprints.html</loc></url>
 <url><loc>/reference/reportForestYield.html</loc></url>
 <url><loc>/reference/reportGridCroparea.html</loc></url>
 <url><loc>/reference/reportGridLand.html</loc></url>
@@ -223,6 +228,7 @@
 <url><loc>/reference/reportLivestockDemStructure.html</loc></url>
 <url><loc>/reference/reportLivestockShare.html</loc></url>
 <url><loc>/reference/reportManure.html</loc></url>
+<url><loc>/reference/reportManureFuel.html</loc></url>
 <url><loc>/reference/reportNetForestChange.html</loc></url>
 <url><loc>/reference/reportNitrogenBudgetCropland.html</loc></url>
 <url><loc>/reference/reportNitrogenBudgetNonagland.html</loc></url>
@@ -249,6 +255,7 @@
 <url><loc>/reference/reportPriceWoodyBiomass.html</loc></url>
 <url><loc>/reference/reportProcessing.html</loc></url>
 <url><loc>/reference/reportProcessingResiduesForestry.html</loc></url>
+<url><loc>/reference/reportProcessingWoodResidues.html</loc></url>
 <url><loc>/reference/reportProducerPriceIndex.html</loc></url>
 <url><loc>/reference/reportProduction.html</loc></url>
 <url><loc>/reference/reportProductionBioenergy.html</loc></url>
@@ -283,6 +290,7 @@
 <url><loc>/reference/reportWaterAvailability.html</loc></url>
 <url><loc>/reference/reportWaterIndicators.html</loc></url>
 <url><loc>/reference/reportWaterUsage.html</loc></url>
+<url><loc>/reference/reportWoodFuel.html</loc></url>
 <url><loc>/reference/reportWorkingAgePopulation.html</loc></url>
 <url><loc>/reference/reportYieldShifter.html</loc></url>
 <url><loc>/reference/reportYields.html</loc></url>
@@ -302,7 +310,7 @@
 <url><loc>/reference/trade.html</loc></url>
 <url><loc>/reference/tradeKastner.html</loc></url>
 <url><loc>/reference/tradeValue.html</loc></url>
-<url><loc>/reference/tradedPrimariesBilateral.html</loc></url>
+<url><loc>/reference/tradedPrimaries.html</loc></url>
 <url><loc>/reference/tryList.html</loc></url>
 <url><loc>/reference/tryReport.html</loc></url>
 <url><loc>/reference/validation.html</loc></url>

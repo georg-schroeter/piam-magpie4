@@ -1,9 +1,12 @@
 # embodiedLand
 
-Calculates production-based and consumption-based (embodied) land
-footprint accounting using bilateral trade flows. Land use is allocated
-to traded products based on production ratios and bilateral trade
-patterns.
+Consumption-based (embodied) land footprint using the column-normalised
+Kastner allocation in
+[`embodiedResourceKastner`](embodiedResourceKastner.md). Unlike
+`embodiedLand` (which uses production + net-trade and can produce local
+negatives), this distributes each region's actual cropland and pasture
+to consumers, so the consumption footprint is non-negative and closes
+globally to total agricultural land.
 
 ## Usage
 
@@ -14,13 +17,11 @@ embodiedLand(
   level = "reg",
   type = "all",
   landType = "all",
-  bilateral = FALSE
+  bilateral = FALSE,
+  secdToFeed = TRUE,
+  reassignLivestock = TRUE
 )
 ```
-
-## Source
-
-tradSecondaryToPrimary.R
 
 ## Arguments
 
@@ -30,51 +31,49 @@ tradSecondaryToPrimary.R
 
 - file:
 
-  a file name the output should be written to using write.magpie
+  optional file name to write the result with `write.magpie`
 
 - level:
 
-  Level of regional aggregation; "reg" (regional), "glo" (global),
-  "regglo" (regional and global) or any other aggregation level defined
-  in superAggregate. Only used when bilateral=FALSE.
+  regional aggregation level (only "reg" supported)
 
 - type:
 
-  Type of accounting: "production" (production-based), "consumption"
-  (consumption-based), "trade" (export, import, and net-trade), "all"
-  (all five), or "flows" (bilateral flows, requires bilateral=TRUE)
+  "production", "consumption", "trade", or "all" (default)
 
 - landType:
 
-  Type of land to report: "crop" (cropland), "past" (pasture), "all"
-  (total agricultural land), or a vector of specific land types
+  "all" (crop + pasture), "crop", or "past"
 
 - bilateral:
 
-  Logical; if TRUE, returns bilateral flows with dimensions
-  (exporter.importer, year, product) instead of regional totals (default
-  FALSE)
+  logical; if TRUE return bilateral (exporter.importer) flows
+
+- secdToFeed:
+
+  logical; if TRUE (default) move the processed-then-fed share (e.g.
+  soybean -\> oilcake -\> feed) from the secd pathway to the feed
+  pathway, so the Livestock pathway captures all crop products that end
+  up as feed. See
+  [`embodiedResourceKastner`](embodiedResourceKastner.md).
+
+- reassignLivestock:
+
+  logical; if TRUE (default) move every livestock product's whole
+  footprint into the feed (Livestock) pathway. See
+  [`embodiedResourceKastner`](embodiedResourceKastner.md). A no-op for
+  land (no kli land).
 
 ## Value
 
-Embodied land use as MAgPIE object. When bilateral=FALSE: dimensions are
-(region, year, accounting.product). When bilateral=TRUE: dimensions are
-(exporter.importer, year, product).
+MAgPIE object in Mha. When bilateral=FALSE: (region, year,
+accounting.pathway.product). When bilateral=TRUE: (exporter.importer,
+year, pathway.product).
 
 ## See also
 
-[`land`](land.md), [`croparea`](croparea.md), [`trade`](trade.md)
+[`embodiedResourceKastner`](embodiedResourceKastner.md), `embodiedLand`
 
 ## Author
 
 David M Chen
-
-## Examples
-
-``` r
-if (FALSE) { # \dontrun{
-  x <- embodiedLand(gdx, type = "all", landType = "all")
-  # Bilateral flows
-  xBilat <- embodiedLand(gdx, type = "flows", bilateral = TRUE)
-} # }
-```
