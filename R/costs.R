@@ -18,14 +18,22 @@
 #'
 costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE) {
 
-  if (!type %in% c("annuity", "investment")) stop("The type selected is not valid. Options: 'annuity' or 'investment'")
+  if (!type %in% c("annuity", "investment", "accounting")) stop("The type selected is not valid. Options: 'annuity' or 'investment'")
 
-  tmpCost <- function(gdx, name, label) {
+  tmpCost <- function(gdx, name, label, factor = 1) {
     cost <- readGDX(gdx, name, format = "first_found", select = list(type = "level"), react = "quiet")
     if (is.null(cost)) return(NULL)
     cost <- dimSums(cost, dim = 3)
     cost <- superAggregateX(cost, aggr_type = "sum", level = "reg")
+    tlabel <- getSets(cost)["d2.1"]
+
+    if (!is.null(getSets(factor))) {
+      getSets(cost)["d2.1"] <- getSets(factor)["d2.2"]
+    }
+
+    cost <- suppressWarnings(dimSums(factor * cost, dim = 2.2))
     dimnames(cost)[[3]] <- label
+    getSets(cost)["d2.1"] <- tlabel
     return(cost)
   }
 
@@ -45,19 +53,43 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
       tSm[, y, ] <- tStep[y]
     }
 
+    tSmfactor <- 1 / tSm
+
     # calculates the conversion factor from "annuity" to "investment"
-    fAn <- (1 + intRate) / (intRate) / tSm
+    fAn <- (1 + intRate) / (intRate) * tSmfactor
 
   }
 
+  if (type == "accounting") {
+
+    intRate <- readGDX(gdx, "pm_interest")[, readGDX(gdx, "t"), ]
+    t <- getYears(intRate, as.integer = TRUE)
+    years <- getYears(intRate, as.integer = FALSE)
+    timegrid <- expand.grid(x = years, y = years)
+    timegrid <- paste0(timegrid$x, ".", timegrid$y)
+
+    yearcomparison <- new.magpie("GLO", timegrid, NULL, fill = 1)
+    yearsobject <- new.magpie("GLO", years, NULL, fill = t)
+    yearsobject2 <- yearsobject
+    getSets(yearsobject2)["d2.1"] <- getSets(yearcomparison)["d2.2"]
+
+    yeararray <- yearcomparison
+    yeardiff <- yeararray * yearsobject - yeararray * yearsobject2
+
+    yearcomparison[yeardiff < 0] <- 0
+    fAn <- yearcomparison
+    tSmfactor <- yearcomparison * (1 - 0.05) ** yeardiff
+  }
+
+
   x <- list(
-    tmpCost(gdx, "ov_cost_landcon", "Land Conversion") * fAn,
+    tmpCost(gdx, "ov_cost_landcon", "Land Conversion", fAn),
     tmpCost(gdx, "ov_cost_transp", "Transport"),
     tmpCost(gdx, "ov_nr_inorg_fert_costs", "N Fertilizer"),
     tmpCost(gdx, "ov_p_fert_costs", "P Fertilizer"),
-    tmpCost(gdx, "ov_reward_cdr_aff", "Reward for Afforestation") * -1 * fAn,
+    tmpCost(gdx, "ov_reward_cdr_aff", "Reward for Afforestation", fAn) * -1,
     tmpCost(gdx, "ov_maccs_costs", "MACCS"),
-    tmpCost(gdx, "ov_cost_AEI", "AEI") * fAn,
+    tmpCost(gdx, "ov_cost_AEI", "AEI", fAn),
     tmpCost(gdx, "ov_cost_timber", "Timber production"),
     tmpCost(gdx, "ov_cost_bioen", "Bioenergy"),
     tmpCost(gdx, c("ov_cost_processing", "ov_processing_costs"), "Processing"),
@@ -74,7 +106,7 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
     tmpCost(gdx, "ov_water_cost",   "Irrigation water"),
     tmpCost(gdx, "ov_cost_packaging",   "Wholesale Costs"),
     tmpCost(gdx, "ov_cost_scm",   "Costs for soil carbon management on cropland"),
-    tmpCost(gdx, "ov_tech_cost", "TC") * fAn
+    tmpCost(gdx, "ov_tech_cost", "TC", fAn)
   )
 
   # Trade
@@ -99,8 +131,8 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
         inputCosts <- tmpCost(gdx, "ov_cost_prod", "Input Factors") + # no investment costs
           # investments (as calculated by MAgPIE) divided by time step length to have a yearly average investment
           # done this way because the conversion factor between investments and annuity is different due to depreciation
-          (tmpCost(gdx, "ov38_investment_immobile", "Input Factors") +
-             tmpCost(gdx, "ov38_investment_mobile", "Input Factors")) / tSm
+          (tmpCost(gdx, "ov38_investment_immobile", "Input Factors", tSmfactor) +
+             tmpCost(gdx, "ov38_investment_mobile", "Input Factors", tSmfactor)) 
       }
 
     }
@@ -129,8 +161,8 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
                            select = list(type = "level"), react = "quiet")[, , "labor"], "Input Factors") + # labor
           # investments (as calculated by MAgPIE) divided by time step length to have a yearly average investment
           # done this way because the conversion factor between investments and annuity is different due to depreciation
-          (tmpCost(gdx, "ov38_investment_immobile", "Input Factors") +
-             tmpCost(gdx, "ov38_investment_mobile", "Input Factors")) / tSm
+          (tmpCost(gdx, "ov38_investment_immobile", "Input Factors", tSmfactor) +
+             tmpCost(gdx, "ov38_investment_mobile", "Input Factors", tSmfactor))
 
       }
 
@@ -145,7 +177,7 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
   } else {
     peatland <- tmpCost(gdx, "ov_peatland_cost", "Peatland") -
       tmpCost(gdx, "ov58_peatland_cost_annuity", "Peatland") +
-      tmpCost(gdx, "ov58_peatland_cost_annuity", "Peatland") * fAn
+      tmpCost(gdx, "ov58_peatland_cost_annuity", "Peatland", fAn)
   }
 
   # Forestry
@@ -154,7 +186,7 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
 
   } else { # current dynamic realization
     forestry <- tmpCost(gdx, "ov_cost_fore", "Forestry") - tmpCost(gdx, "ov32_cost_establishment", "Forestry") +
-      tmpCost(gdx, "ov32_cost_establishment", "Forestry") * fAn # to turn into "investment" or "annuity"
+      tmpCost(gdx, "ov32_cost_establishment", "Forestry", fAn) # to turn into "investment" or "annuity"
   }
 
   # CroplandTree
@@ -164,7 +196,7 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
   } else {
     croplandTree <- tmpCost(gdx, "ov_cost_cropland", "CroplandTree") -
       tmpCost(gdx, "ov29_cost_treecover_est", "CroplandTree") +
-      tmpCost(gdx, "ov29_cost_treecover_est", "CroplandTree") * fAn # from "investment" or "annuity"
+      tmpCost(gdx, "ov29_cost_treecover_est", "CroplandTree", fAn) # from "investment" or "annuity"
   }
 
   # GHG emissions
@@ -185,7 +217,16 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
   }
 
   # from "investment" or "annuity"
-  emissions <- tmpCost(gdx, "ov_emission_costs", "GHG Emissions") - emisCostOneoff + emisCostOneoff * fAn
+  correction <- emisCostOneoff
+  if (!is.null(getSets(fAn))) {
+    getSets(correction)["d2.1"] <- getSets(fAn)["d2.2"]
+    correction <- suppressWarnings(dimSums(fAn * correction, dim = 2.2))
+    getSets(correction)["d2.1"] <- "t"
+  } else {
+    correction <- correction * fAn
+  }
+
+  emissions <- tmpCost(gdx, "ov_emission_costs", "GHG Emissions") - emisCostOneoff + correction
 
   # adds the special cases to the overall list of costs
   x <- mbind(c(x, list(tradeCosts, inputCosts, peatland, forestry, croplandTree, emissions)))
