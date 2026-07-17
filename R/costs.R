@@ -32,8 +32,9 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
     }
 
     cost <- suppressWarnings(dimSums(factor * cost, dim = 2.2))
-    dimnames(cost)[[3]] <- label
     getSets(cost)["d2.1"] <- tlabel
+
+    dimnames(cost)[[3]] <- label
     return(cost)
   }
 
@@ -78,7 +79,10 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
 
     yearcomparison[yeardiff < 0] <- 0
     fAn <- yearcomparison
-    tSmfactor <- yearcomparison * (1 - 0.05) ** yeardiff
+
+    intRateCopy <- intRate
+    getSets(intRateCopy)["d2.1"] <- getSets(yearcomparison)["d2.2"]
+    tSmfactor <- yearcomparison * (1 - 0.05) ** yeardiff * (intRateCopy + 0.05) / (1 + intRateCopy)
   }
 
 
@@ -219,9 +223,10 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
   # from "investment" or "annuity"
   correction <- emisCostOneoff
   if (!is.null(getSets(fAn))) {
+    tlabel <- getSets(correction)["d2.1"]
     getSets(correction)["d2.1"] <- getSets(fAn)["d2.2"]
     correction <- suppressWarnings(dimSums(fAn * correction, dim = 2.2))
-    getSets(correction)["d2.1"] <- "t"
+    getSets(correction)["d2.1"] <- tlabel
   } else {
     correction <- correction * fAn
   }
