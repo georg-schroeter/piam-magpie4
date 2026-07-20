@@ -82,7 +82,9 @@ costs <- function(gdx, file = NULL, level = "reg", type = "annuity", sum = TRUE)
 
     intRateCopy <- intRate
     getSets(intRateCopy)["d2.1"] <- getSets(yearcomparison)["d2.2"]
-    tSmfactor <- yearcomparison * (1 - 0.05) ** yeardiff * (intRateCopy + 0.05) / (1 + intRateCopy)
+
+    depreciationRate <- readGDX(gdx, "s38_depreciation_rate")
+    tSmfactor <- yearcomparison * (1 - depreciationRate) ** yeardiff * (intRateCopy + depreciationRate) / (1 + intRateCopy)
   }
 
 
